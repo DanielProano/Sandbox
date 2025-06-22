@@ -44,32 +44,36 @@ class tonelli_shanks:
         if pow(pot, ((p - 1) // 2), p) == 1:
             return True
         return False
-    def find_S(self, num, p):
-        temp = num
-        index = 1
-        while temp < p - 1:
-            temp = num * (2**index)
-            index += 1
-        if temp == p - 1:
-            return index - 1
-        return None
+    def find_S_Q(self, p):
+        S = 0
+        Q = p - 1
+        while Q % 2 == 0:
+            Q //= 2
+            S += 1
+        return S, Q
     def find_z(self, p):
         for i in range(2, p, 1):
             z = self.eulers_criterion(i, p)
             if not z:
                 return i
+
     def loop(self, M, c, t, R, p):
         if t == 1:
             return R
         for z in range(1, M):
-            if t**(2**z) % p == 1:
+            if t ** (2 ** z) % p == 1:
                 i = z
                 break
-        b = (c ** (2 ** (M - i - 1))) % p
-        return self.loop(i, b**2 % p, (t * b**2) % p, R * b % p, p)
+        b = pow(c, 2 ** (M - i - 1), p)
+        return self.loop(i, pow(b, 2, p), (t * pow(b, 2, p)) % p, pow(R * b, 1, p), p)
 
 get_r = tonelli_shanks()
-S = 3
-z = 3
-result = get_r.loop(S, z**5 % 41, 5**5 % 41, (5**((5+1) // 2)) % 41, 41)
+
+if not get_r.eulers_criterion(num, prime):
+    print("No square root")
+S, Q= get_r.find_S_Q(prime)
+print(S, Q)
+z = get_r.find_z(prime)
+print(z)
+result = get_r.loop(S, pow(z, Q, prime), pow(num, Q, prime), pow(num, (Q+1) // 2, prime), prime)
 print(result)
